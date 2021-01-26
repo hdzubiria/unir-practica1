@@ -8,7 +8,7 @@ import boto3
 dynamodb = boto3.resource('dynamodb')
 
 
-# Crear una nueva Nota
+# Crear una nueva Nota - HDZ
 def create(event, context):
     data = json.loads(event['body'])
     if 'text' not in data:
