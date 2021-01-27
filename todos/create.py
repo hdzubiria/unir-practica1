@@ -9,6 +9,8 @@ dynamodb = boto3.resource('dynamodb')
 
 
 # Crear una nueva Nota - HDZ EXITO
+# Crear una nueva Nota - PRUEBA DE PULL REQUEST
+# Crear una nueva Nota - PRUEBA DE PULL REQUEST
 def create(event, context):
     data = json.loads(event['body'])
     if 'text' not in data:
