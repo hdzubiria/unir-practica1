@@ -3,7 +3,7 @@ import os
 import boto3
 dynamodb = boto3.resource('dynamodb')
 
-
+# Borra  una nueva Nota - PARA ENTREGAR
 def delete(event, context):
     table = dynamodb.Table(os.environ['DYNAMODB_TABLE'])
 
