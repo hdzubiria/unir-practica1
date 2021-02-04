@@ -132,3 +132,21 @@ class todoTable(object):
         
         return
         
+
+    def translate_todo(self, id,language):
+        table = self.dynamodb.Table(self.tableName)
+
+        # fetch todo from the database
+        result = table.get_item(
+            Key={
+                'id': id
+            }
+        )
+        
+        # Traduccion
+        text_to_translate = result['Item']['text']
+        translating = boto3.client(service_name='translate', region_name='us-east-1', use_ssl=True)
+        translated = translating.translate_text(Text=text_to_translate, SourceLanguageCode='en', TargetLanguageCode=language)
+        result['Item']['text'] = translated['TranslatedText']
+        
+        return result

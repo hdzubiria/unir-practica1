@@ -1,34 +1,21 @@
 import os
 import json
-
+from todos import todoTable
 from todos import decimalencoder
-import boto3
-dynamodb = boto3.resource('dynamodb')
-
 
 def translate(event, context):
-    table = dynamodb.Table(os.environ['DYNAMODB_TABLE'])
 
-    # fetch todo from the database
-    result = table.get_item(
-        Key={
-            'id': event['pathParameters']['id']
-        }
-    )
-
-    # Traduccion
+    # Call todoTable
+    todo_repository = todoTable.todoTable(os.environ['DYNAMODB_TABLE'])
+    id= event['pathParameters']['id']
     target_lang = event['pathParameters']['language']
-    text_to_translate = result['Item']['text']
 
-    translating = boto3.client(service_name='translate', region_name='us-east-1', use_ssl=True)
-    translated = translating.translate_text(Text=text_to_translate, SourceLanguageCode='en', TargetLanguageCode=target_lang)
-
-    result['Item']['text'] = translated['TranslatedText']
+    item = todo_repository.translate_todo(id,target_lang)
 
     # create a response
     response = {
         "statusCode": 200,
-        "body": json.dumps(result['Item'],
+        "body": json.dumps(item['Item'],
                            cls=decimalencoder.DecimalEncoder)
     }
 
