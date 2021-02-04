@@ -22,7 +22,7 @@ def translate(event, context):
 
     translating = boto3.client(service_name='translate', region_name='us-east-1', use_ssl=True)
     translated = translating.translate_text(Text=text_to_translate, SourceLanguageCode='en', TargetLanguageCode=target_lang)
-    
+
     result['Item']['text'] = translated['TranslatedText']
 
     # create a response

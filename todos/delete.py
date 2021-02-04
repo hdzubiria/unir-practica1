@@ -1,18 +1,13 @@
 import os
+from todos import todoTable
 
-import boto3
-dynamodb = boto3.resource('dynamodb')
 
 # Borra  una nueva Nota - PARA ENTREGAR
 def delete(event, context):
-    table = dynamodb.Table(os.environ['DYNAMODB_TABLE'])
 
-    # delete the todo from the database
-    table.delete_item(
-        Key={
-            'id': event['pathParameters']['id']
-        }
-    )
+    # Call todoTable
+    todo_repository = todoTable.todoTable(os.environ['DYNAMODB_TABLE'])
+    todo_repository.delete_todo(event['pathParameters']['id'])
 
     # create a response
     response = {

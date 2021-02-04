@@ -1,25 +1,20 @@
 import os
 import json
-
 from todos import decimalencoder
-import boto3
-dynamodb = boto3.resource('dynamodb')
+from todos import todoTable
 
 
 def get(event, context):
-    table = dynamodb.Table(os.environ['DYNAMODB_TABLE'])
-
-    # fetch todo from the database
-    result = table.get_item(
-        Key={
-            'id': event['pathParameters']['id']
-        }
-    )
+    
+    # Call todoTable
+    todo_repository = todoTable.todoTable(os.environ['DYNAMODB_TABLE'])
+    id= event['pathParameters']['id']
+    item = todo_repository.get_todo(id)
 
     # create a response
     response = {
         "statusCode": 200,
-        "body": json.dumps(result['Item'],
+        "body": json.dumps(item['Item'],
                            cls=decimalencoder.DecimalEncoder)
     }
 

@@ -1,11 +1,9 @@
 import json
-import time
 import logging
 import os
 
 from todos import decimalencoder
-import boto3
-dynamodb = boto3.resource('dynamodb')
+from todos import todoTable
 
 
 def update(event, context):
@@ -13,35 +11,18 @@ def update(event, context):
     if 'text' not in data or 'checked' not in data:
         logging.error("Validation Failed")
         raise Exception("Couldn't update the todo item.")
-        return
 
-    timestamp = int(time.time() * 1000)
-
-    table = dynamodb.Table(os.environ['DYNAMODB_TABLE'])
-
-    # update the todo in the database
-    result = table.update_item(
-        Key={
-            'id': event['pathParameters']['id']
-        },
-        ExpressionAttributeNames={
-          '#todo_text': 'text',
-        },
-        ExpressionAttributeValues={
-          ':text': data['text'],
-          ':checked': data['checked'],
-          ':updatedAt': timestamp,
-        },
-        UpdateExpression='SET #todo_text = :text, '
-                         'checked = :checked, '
-                         'updatedAt = :updatedAt',
-        ReturnValues='ALL_NEW',
-    )
+    # Call todoTable
+    todo_repository = todoTable.todoTable(os.environ['DYNAMODB_TABLE'])
+    item = todo_repository.update_todo(data['text'],
+                                            event['pathParameters']['id'],
+                                            data['checked']
+                                        )
 
     # create a response
     response = {
         "statusCode": 200,
-        "body": json.dumps(result['Attributes'],
+        "body": json.dumps(item['Attributes'],
                            cls=decimalencoder.DecimalEncoder)
     }
 

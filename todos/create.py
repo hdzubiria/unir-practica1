@@ -1,11 +1,8 @@
 import json
 import logging
 import os
-import time
 import uuid
-
-import boto3
-dynamodb = boto3.resource('dynamodb')
+from todos import todoTable
 
 
 # Crear una nueva Nota - PARA ENTREGAR
@@ -15,20 +12,10 @@ def create(event, context):
         logging.error("Validation Failed")
         raise Exception("Couldn't create the todo item.")
     
-    timestamp = str(time.time())
-
-    table = dynamodb.Table(os.environ['DYNAMODB_TABLE'])
-
-    item = {
-        'id': str(uuid.uuid1()),
-        'text': data['text'],
-        'checked': False,
-        'createdAt': timestamp,
-        'updatedAt': timestamp,
-    }
-
-    # write the todo to the database
-    table.put_item(Item=item)
+    # Call todoTable
+    todo_repository = todoTable.todoTable(os.environ['DYNAMODB_TABLE'])
+    id = str(uuid.uuid1())
+    item = todo_repository.put_todo(data['text'],id)
 
     # create a response
     response = {
